@@ -54,7 +54,11 @@ def manage():
 def get_session():
     if metadata.session_expired:
         response.status = 404
-        return {'error': 'No session has been created or session expired.'}
+        return {
+            'error': {
+                'message': 'No session has been created or session expired.'
+            }
+        }
 
     return {
         'session': {
@@ -80,7 +84,11 @@ def create_session():
 
     if not token:
         response.status = 400
-        return {'error': 'token is required'}
+        return {
+            'error': {
+                'message': 'token is required'
+            }
+        }
 
     metadata.get_session(token)
     return get_session()
