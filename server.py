@@ -8,6 +8,7 @@ from boto import sts
 import boto.iam
 from datetime import datetime
 import subprocess
+import argparse
 
 
 def get(d, *keys):
@@ -207,16 +208,22 @@ class Metadata(object):
 
 if __name__ == '__main__':
     app = bottle.default_app()
-    app.config.load_config('/etc/aws-metadata.conf')
     config_file_path = os.path.join(os.path.dirname(__file__), 'server.conf')
     app.config.load_config(config_file_path)
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--host',
+        default=app.config.get('metadata.host', '169.254.169.254'))
+    parser.add_argument(
+        '--port', type=int,
+        default=int(app.config.get('metadata.port', 45000)))
+    args = parser.parse_args()
+
     metadata = Metadata(
-        region=app.config.get('metadata.region', 'us-east-1'),
-        access_key=app.config.get('metadata.access_key'),
-        secret_key=app.config.get('metadata.secret_key'),
+        region=app.config.get('aws.region', 'us-east-1'),
+        access_key=app.config.get('aws.access_key'),
+        secret_key=app.config.get('aws.secret_key'),
         token_duration=app.config.get('metadata.token_duration'))
 
-    app.run(
-        host=app.config.get('metadata.host', '169.254.169.254'),
-        port=int(app.config.get('metadata.port', 45000)))
+    app.run(host=args.host, port=args.port)
