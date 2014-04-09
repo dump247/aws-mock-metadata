@@ -89,7 +89,7 @@ and continue their action.
 # User Interface
 
 A simple UI to view, reset, and update the session credentials is
-available by loading *http://169.254.169.254/manage/session* in your
+available by loading *http://169.254.169.254/manage* in your
 browser.
 
 # API
