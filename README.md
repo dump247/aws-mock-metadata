@@ -29,10 +29,33 @@ other platforms.
 This should be changed to run as a launchd daemon at some point.
 
 1. Clone the repo
-2. Run `macos-server`
+2. Add AWS access key and secret key to *server.conf* in the repo
+   directory
+  * See Configuration section
+  * These permanent keys are used to generate the session keys using the MFA token
+3. Run `macos-server`
   * Prompts for password to setup an IP alias and firewall forwarding rule.
   * You can examine the script and run the commands separately. The
     script is only provided for convenience.
+
+# Configuration
+
+*server.conf*
+
+```
+[aws]
+access_key=...   # Required. Access key to generate temp keys with.
+secret_key=...   # Required. Secret key to generate temp keys with.
+region=us-east-1 # Optional. Not generally necessary since IAM and STS
+                 # are not region specific. Default is us-east-1.
+
+[metadata]
+host=169.254.169.254 # Optional. Interface to bind to. Default is
+                     # 169.254.169.254.
+port=45000           # Optional. Port to bind to. Default is 45000.
+token_duration=43200 # Optional. Timeout, in seconds, for the generated
+                     # keys. Default is 12 hours. Minimum is 15 minutes.
+```
 
 # Mock Endpoints
 
