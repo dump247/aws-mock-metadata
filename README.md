@@ -37,7 +37,6 @@ This should be changed to run as a launchd daemon at some point.
 The following EC2 metadata service endpoints are implemented.
 
 ```
-/
 /latest/meta-data/iam/security-credentials/
 /latest/meta-data/iam/security-credentials/local-credentials
 ```

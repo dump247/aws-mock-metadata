@@ -19,12 +19,6 @@ def first(l):
     return l[0] if len(l) > 0 else None
 
 
-@route('/')
-def list_api_versions():
-    response.content_type = 'text/plain; charset=UTF-8'
-    return 'latest'
-
-
 @route('/latest/meta-data/iam/security-credentials/')
 def list_profiles():
     response.content_type = 'text/plain; charset=UTF-8'
