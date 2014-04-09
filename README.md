@@ -21,6 +21,15 @@ the user to enter the MFA device token. Those credentials are cached
 until they expire and the user is prompted again to provide an updated
 token.
 
+# Shortcomings
+
+The mock service uses
+[GetSessionToken](http://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html)
+to create the session credentials from the MFA token. Credentials
+returned by GetSessionToken can not perform IAM or STS actions. To
+accomplish that, the service would somehow need to use
+[AssumeRole](http://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html).
+
 # Installation
 
 Currently only works on OSX, but should be trivial to make it work on
