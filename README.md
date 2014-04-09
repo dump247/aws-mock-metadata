@@ -30,7 +30,9 @@ This should be changed to run as a launchd daemon at some point.
 
 1. Clone the repo
 2. Run `macos-server`
-  * Prompts for password to setup an IP alias and firewall forwarding rule
+  * Prompts for password to setup an IP alias and firewall forwarding rule.
+  * You can examine the script and run the commands separately. The
+    script is only provided for convenience.
 
 # Mock Endpoints
 
