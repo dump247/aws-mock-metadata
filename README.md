@@ -43,6 +43,12 @@ The following EC2 metadata service endpoints are implemented.
 /latest/meta-data/iam/security-credentials/local-credentials
 ```
 
+# User Interface
+
+A simple UI to view, reset, and update the session credentials is
+available by loading *http://169.254.169.254/manage/session* in your
+browser.
+
 # API
 
 There is an API available to query and update the MFA session
