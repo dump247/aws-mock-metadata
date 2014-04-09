@@ -163,3 +163,9 @@ Session was created successfully. Returns the session credentials.
     }
 }
 ```
+# License
+
+The MIT License (MIT)
+Copyright (c) 2014 Cory Thomas
+
+See [LICENSE](LICENSE)
