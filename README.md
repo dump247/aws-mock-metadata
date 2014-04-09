@@ -21,6 +21,17 @@ the user to enter the MFA device token. Those credentials are cached
 until they expire and the user is prompted again to provide an updated
 token.
 
+# Installation
+
+Currently only works on OSX, but should be trivial to make it work on
+other platforms.
+
+This should be changed to run as a launchd daemon at some point.
+
+1. Clone the repo
+2. Run `macos-server`
+  * Prompts for password to setup an IP alias and firewall forwarding rule
+
 # Mock Endpoints
 
 The following EC2 metadata service endpoints are implemented.
