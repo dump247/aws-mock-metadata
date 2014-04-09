@@ -82,9 +82,7 @@ up prompting for the MFA token. The dialog blocks the request until the
 correct token is entered. Once the token is provided, the session
 credentials are generated and cached until they expire. Once they
 expire, a new token prompt will appear on the next request for
-credentials. Most SDKs will eventually timeout when requesting
-credentials, but the user should have 10-15 seconds to enter the token
-and continue their action.
+credentials.
 
 # User Interface
 
