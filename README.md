@@ -33,6 +33,7 @@ This should be changed to run as a launchd daemon at some point.
    directory
   * See Configuration section
   * These permanent keys are used to generate the session keys using the MFA token
+  * There must be an MFA device associated with the account
 3. Run `macos-server`
   * Prompts for password to setup an IP alias and firewall forwarding rule.
   * You can examine the script and run the commands separately. The
@@ -65,6 +66,16 @@ The following EC2 metadata service endpoints are implemented.
 /latest/meta-data/iam/security-credentials/
 /latest/meta-data/iam/security-credentials/local-credentials
 ```
+
+When `/latest/meta-data/iam/security-credentials/local-credentials` is
+requested, and there are no session credentials available, a dialog pops
+up prompting for the MFA token. The dialog blocks the request until the
+correct token is entered. Once the token is provided, the session
+credentials are generated and cached until they expire. Once they
+expire, a new token prompt will appear on the next request for
+credentials. Most SDKs will eventually timeout when requesting
+credentials, but the user should have 10-15 seconds to enter the token
+and continue their action.
 
 # User Interface
 
