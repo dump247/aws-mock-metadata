@@ -72,8 +72,8 @@ token_duration=43200 # Optional. Timeout, in seconds, for the generated
 The following EC2 metadata service endpoints are implemented.
 
 ```
-/latest/meta-data/iam/security-credentials/
-/latest/meta-data/iam/security-credentials/local-credentials
+169.254.169.254/latest/meta-data/iam/security-credentials/
+169.254.169.254/latest/meta-data/iam/security-credentials/local-credentials
 ```
 
 When `/latest/meta-data/iam/security-credentials/local-credentials` is
