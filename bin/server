@@ -67,7 +67,8 @@ if __name__ == '__main__':
         region=app.config.get('aws.region', 'us-east-1'),
         access_key=app.config.get('aws.access_key'),
         secret_key=app.config.get('aws.secret_key'),
-        token_duration=to_int(app.config.get('metadata.token_duration'))))
+        token_duration=to_int(app.config.get('metadata.token_duration')),
+        role_arn=app.config.get('metadata.role_arn')))
 
     app.run(
         host=args.host or app.config.get('metadata.host', '169.254.169.254'),

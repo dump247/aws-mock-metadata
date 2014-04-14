@@ -21,15 +21,6 @@ the user to enter the MFA device token. Those credentials are cached
 until they expire and the user is prompted again to provide an updated
 token.
 
-# Shortcomings
-
-The mock service uses
-[GetSessionToken](http://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html)
-to create the session credentials from the MFA token. Credentials
-returned by GetSessionToken can not perform IAM or STS actions. To
-accomplish that, the service would somehow need to use
-[AssumeRole](http://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html).
-
 # Installation
 
 Currently only works on OSX, but should be trivial to make it work on
@@ -64,7 +55,21 @@ host=169.254.169.254 # Optional. Interface to bind to. Default is
                      # 169.254.169.254.
 port=45000           # Optional. Port to bind to. Default is 45000.
 token_duration=43200 # Optional. Timeout, in seconds, for the generated
-                     # keys. Default is 12 hours. Minimum is 15 minutes.
+                     # keys. Minimum is 15 minutes.
+                     # Default is 12 hours for sts:GetSessionToken and
+                     # 1 hour for sts:AssumeRole. Maximum is 36 hours
+                     # for sts:GetSessionToken and 1 hour for
+                     # sts:AssumeRole.
+role_arn=arn:aws:iam::123456789012:role/${aws:username}
+                     # Optional. ARN of a role to assume. If specified,
+                     # the metadata server uses sts:AssumeRole to create
+                     # the temporary credentials. Otherwise, the
+                     # metadata server uses sts:GetSessionToken.
+                     # The string '${aws:username}' will be replaced
+                     # with the name of the user requesting the
+                     # credentials. No other variables are currently
+                     # supported.
+
 ```
 
 # Mock Endpoints

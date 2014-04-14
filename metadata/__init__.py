@@ -10,11 +10,12 @@ from metadata.util import cache, first_item, get_value
 
 class Metadata(object):
     def __init__(self, region=None, access_key=None, secret_key=None,
-                 token_duration=None):
+                 token_duration=None, role_arn=None):
         self.region = region or 'us-east-1'
         self.access_key = access_key
         self.secret_key = secret_key
         self.token_duration = token_duration
+        self.role_arn = None
 
         self.user = None
         self.session = None
@@ -22,6 +23,10 @@ class Metadata(object):
         self.mfa_serial_number = None
 
         self._load_user()
+
+        if role_arn:
+            self.role_arn = role_arn.replace('${aws:username}',
+                                             self.user.user_name)
 
     @cache
     def iam(self):
@@ -64,6 +69,23 @@ class Metadata(object):
         script = os.path.join(os.path.dirname(__file__), 'prompt.py')
         return subprocess.check_output(['/usr/bin/python', script]).strip()
 
+    def _create_session(self, token_value):
+        if self.role_arn:
+            role = self.sts.assume_role(
+                role_arn=self.role_arn,
+                role_session_name='some_session_id',
+                duration_seconds=self.token_duration,
+                mfa_serial_number=self.mfa_serial_number,
+                mfa_token=token_value if self.mfa_serial_number else None)
+
+            return role.credentials
+        else:
+            return self.sts.get_session_token(
+                duration=self.token_duration,
+                force_new=True,
+                mfa_serial_number=self.mfa_serial_number,
+                mfa_token=token_value if self.mfa_serial_number else None)
+
     def clear_session(self):
         self.session = None
         self.session_expiration = datetime.min
@@ -74,11 +96,7 @@ class Metadata(object):
                 while self.mfa_serial_number and not token_value:
                     token_value = self._prompt_token()
 
-                self.session = self.sts.get_session_token(
-                    duration=self.token_duration,
-                    force_new=True,
-                    mfa_serial_number=self.mfa_serial_number,
-                    mfa_token=token_value if self.mfa_serial_number else None)
+                self.session = self._create_session(token_value)
 
                 # Needs testing, but might be worth subtracting X seconds
                 # to prevent returning outdated session token. SDKs and AWS
