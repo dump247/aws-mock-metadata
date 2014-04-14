@@ -69,7 +69,20 @@ role_arn=arn:aws:iam::123456789012:role/${aws:username}
                      # with the name of the user requesting the
                      # credentials. No other variables are currently
                      # supported.
+```
 
+## AWS CLI
+
+It is recommended to update the local metadata service timeout for the
+AWS command line interface. This ensures that you have enough time to
+enter the MFA token before the request expires and your script can
+continue without interruption.
+
+*~/.aws/config*
+
+```
+[default]
+metadata_service_timeout = 15.0  # 15 second timeout to enter MFA token
 ```
 
 # Mock Endpoints
