@@ -43,7 +43,7 @@ This should be changed to run as a launchd daemon at some point.
   * See Configuration section
   * These permanent keys are used to generate the session keys using the MFA token
   * There must be an MFA device associated with the account
-3. Run `macos-server`
+3. Run `bin/server-macos`
   * Prompts for password to setup an IP alias and firewall forwarding rule.
   * You can examine the script and run the commands separately. The
     script is only provided for convenience.

@@ -1,0 +1,74 @@
+#!/usr/bin/python
+
+from __future__ import absolute_import, print_function
+
+import argparse
+from os import path
+import sys
+
+APP_DIR = path.abspath(path.join(path.dirname(__file__), '..'))
+DEFAULT_CONFIG_FILE = path.relpath(path.join(APP_DIR, 'server.conf'))
+sys.path.append(APP_DIR)
+
+from metadata import bottle, routes, Metadata
+
+
+bottle.TEMPLATE_PATH.append(path.join(APP_DIR, 'metadata/views'))
+
+
+def port(value):
+    value = int(value)
+
+    if value < 0 or value > 65535:
+        raise argparse.ArgumentTypeError(
+            "invalid port value: {}: value must be 0-65535".format(value))
+
+    return value
+
+
+def file(value):
+    if not path.isfile(value):
+        raise argparse.ArgumentTypeError(
+            "not an existing file: {}".format(value))
+
+    return value
+
+
+def to_int(value):
+    return value if value is None else int(value)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '--config',
+        metavar='FILE',
+        type=file,
+        help='configuration file (default: {})'.format(DEFAULT_CONFIG_FILE),
+        default=DEFAULT_CONFIG_FILE)
+
+    parser.add_argument(
+        '--host',
+        help=('interface to bind the metadata server to '
+              '(default: 169.254.169.254)'))
+
+    parser.add_argument(
+        '--port',
+        type=port,
+        help='port to bind the metadata server to (default: 45000)')
+
+    args = parser.parse_args()
+
+    app = bottle.default_app()
+    app.config.load_config(args.config)
+
+    app.config.meta_set('metadata', 'obj', Metadata(
+        region=app.config.get('aws.region', 'us-east-1'),
+        access_key=app.config.get('aws.access_key'),
+        secret_key=app.config.get('aws.secret_key'),
+        token_duration=to_int(app.config.get('metadata.token_duration'))))
+
+    app.run(
+        host=args.host or app.config.get('metadata.host', '169.254.169.254'),
+        port=args.port or int(app.config.get('metadata.port', 45000)))
