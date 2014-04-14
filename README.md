@@ -148,7 +148,7 @@ Session credentials were cleared or no session exists.
 
 `POST 169.254.169.254/manage/session`
 
-Example: `curl -X POST -d code=123456 169.254.169.254/manage/session`
+Example: `curl -X POST -d token=123456 169.254.169.254/manage/session`
 
 ### Body
 
