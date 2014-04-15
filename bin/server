@@ -26,14 +26,6 @@ def port(value):
     return value
 
 
-def file(value):
-    if not path.isfile(value):
-        raise argparse.ArgumentTypeError(
-            "not an existing file: {}".format(value))
-
-    return value
-
-
 def to_int(value):
     return value if value is None else int(value)
 
@@ -44,9 +36,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '--config',
         metavar='FILE',
-        type=file,
+        type=argparse.FileType('r'),
         help='configuration file (default: {})'.format(DEFAULT_CONFIG_FILE),
-        default=DEFAULT_CONFIG_FILE)
+        default=DEFAULT_CONFIG_FILE if path.exists(DEFAULT_CONFIG_FILE) else None)
 
     parser.add_argument(
         '--host',
@@ -61,7 +53,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     app = bottle.default_app()
-    app.config.load_config(args.config)
+    if args.config:
+        app.config.load_config(args.config)
 
     app.config.meta_set('metadata', 'obj', Metadata(
         region=app.config.get('aws.region', 'us-east-1'),

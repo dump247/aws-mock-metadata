@@ -9,13 +9,13 @@ from metadata.util import cache, first_item, get_value
 
 
 class Metadata(object):
-    def __init__(self, region=None, access_key=None, secret_key=None,
+    def __init__(self, region='us-east-1', access_key=None, secret_key=None,
                  token_duration=None, role_arn=None):
-        self.region = region or 'us-east-1'
+        self.region = region
         self.access_key = access_key
         self.secret_key = secret_key
         self.token_duration = token_duration
-        self.role_arn = None
+        self.role_arn = role_arn
 
         self.user = None
         self.session = None
