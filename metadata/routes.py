@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from boto.exception import BotoServerError
+
 from metadata.bottle import route, response, view, delete, post, request
 
 
@@ -11,14 +13,18 @@ def list_profiles():
 
 @route('/latest/meta-data/iam/security-credentials/local-credentials')
 def get_credentials():
-    session = request.app.config.meta_get('metadata', 'obj').get_session()
+    try:
+        session = request.app.config.meta_get('metadata', 'obj').get_session()
 
-    return {
-        'AccessKeyId':     session.access_key,
-        'SecretAccessKey': session.secret_key,
-        'Token':           session.session_token,
-        'Expiration':      session.expiration
-    }
+        return {
+            'AccessKeyId':     session.access_key,
+            'SecretAccessKey': session.secret_key,
+            'Token':           session.session_token,
+            'Expiration':      session.expiration
+        }
+    except BotoServerError as e:
+        response.status = e.status
+        return { 'error': { 'message': e.message } }
 
 
 @route('/manage')
