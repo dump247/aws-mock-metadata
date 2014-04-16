@@ -45,8 +45,12 @@ This should be changed to run as a launchd daemon at some point.
 
 ```
 [aws]
-access_key=...   # Required. Access key to generate temp keys with.
-secret_key=...   # Required. Secret key to generate temp keys with.
+access_key=...   # Optional. Access key to generate temp keys with.
+                 # If not provided, the service falls back on boto's
+                 # credential discovery.
+secret_key=...   # Optional. Secret key to generate temp keys with.
+                 # If not provided, the service falls back on boto's
+                 # credential discovery.
 region=us-east-1 # Optional. Not generally necessary since IAM and STS
                  # are not region specific. Default is us-east-1.
 
