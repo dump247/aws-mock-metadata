@@ -24,7 +24,7 @@ def get_credentials():
         }
     except BotoServerError as e:
         response.status = e.status
-        return { 'error': { 'message': e.message } }
+        return {'error': {'message': e.message}}
 
 
 @route('/manage')
