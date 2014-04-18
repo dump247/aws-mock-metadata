@@ -73,6 +73,20 @@ role_arn=arn:aws:iam::123456789012:role/${aws:username}
                      # with the name of the user requesting the
                      # credentials. No other variables are currently
                      # supported.
+profile=...          # Name of the initial profile to select. Default is
+                     # "default".
+
+# Define a profile. A profile consists of a set of options
+# used to create a session.
+# Multiple profiles can be defined and switched on-the-fly.
+# Default option values are taken from the [aws] and [metadata]
+# sections.
+[profile:NAME]  # NAME is a string used to identify the profile
+access_key=...
+secret_key=...
+region=...
+token_duration=...
+role_arn=...
 ```
 
 ## AWS CLI
@@ -117,25 +131,82 @@ browser.
 There is an API available to query and update the MFA session
 credentials.
 
+## Get Profiles
+
+`GET 169.254.169.254/manage/profiles`
+
+### Response: 200
+
+```json
+{
+    "profiles": [
+        {
+            "name": "...",
+            "accessKey": "...",
+            "region": "...",
+            "tokenDuration": 123, // Optional
+            "roleArn": "...",     // Optional
+            "session": {  // Optional, if there is no active session for the profile
+                "accessKey": "....",
+                "secretKey": "....",
+                "sessionToken": "...",
+                "expiration": "2014-04-09T09:00:44Z"
+            },
+        }
+    ]
+}
+```
+
+## Get Profile
+
+`GET 169.254.169.254/manage/profiles/NAME`
+
+### Response: 404
+
+* Profile does not exist.
+
+### Response: 200
+
+```json
+{
+    "profile": {
+        "name": "...",
+        "accessKey": "...",
+        "region": "...",
+        "tokenDuration": 123, // Optional
+        "roleArn": "...",     // Optional
+        "session": {  // Optional, if there is no active session for the profile
+            "accessKey": "....",
+            "secretKey": "....",
+            "sessionToken": "...",
+            "expiration": "2014-04-09T09:00:44Z"
+        },
+    }
+}
+```
+
 ## Get Credentials
 
 `GET 169.254.169.254/manage/session`
 
-### Response: 404
-
-There is no current session.
-
 ### Response: 200
 
-There is a valid session. Returns the session credentials.
+Returns current session information.
 
 ```json
 {
-    "session": {
+    "session": {  // Optional, if there is no active session for the profile
         "accessKey": "....",
         "secretKey": "....",
         "sessionToken": "...",
         "expiration": "2014-04-09T09:00:44Z"
+    },
+    "profile": {
+        "accessKey": "...",
+        "region": "...",
+        "name": "...",
+        "tokenDuration": 123, // Optional
+        "roleArn": "..."      // Optional
     }
 }
 ```
@@ -152,43 +223,63 @@ Session credentials were cleared or no session exists.
 
 `POST 169.254.169.254/manage/session`
 
-Example: `curl -X POST -d token=123456 169.254.169.254/manage/session`
+Create a new session, change the current profile, or both.
+
+Examples:
+```bash
+curl -X POST -d token=123456 169.254.169.254/manage/session
+curl -X POST -d session=other 169.254.169.254/manage/session
+curl -X POST -d 'token=123456&session=other' 169.254.169.254/manage/session
+```
 
 ### Body
 
 *Content-Type: application/x-www-form-urlencoded*
 
 ```
-token=123456
+token=123456&session=other
 ```
 
 *Content-Type: application/json*
 
 ```json
 {
-    "token": "123456"
+    "token": "123456",
+    "session": "other"
 }
 ```
 
 ### Response: 400
 
-Invalid MFA token string format or token was not provided.
+* Invalid MFA token string format. Must be 6 digits.
+* The specified profile name does not exist.
+* Neither profile nor token was specified.
 
-### Response: 401
+### Response: 403
 
-Specified MFA token does not match expected token for the MFA device.
+* Specified MFA token does not match expected token for the MFA device.
 
 ### Response: 200
 
-Session was created successfully. Returns the session credentials.
+Session was created successfully and/or profile the was changed. Returns the
+session information. The response will contain a session if a valid token was
+provided. The response will not contain a session if only a new profile name was
+specified and the profile does not have an existing session.
 
 ```json
 {
-    "session": {
+    "session": {  // Optional, if there is no active session for the profile
         "accessKey": "....",
         "secretKey": "....",
         "sessionToken": "...",
         "expiration": "2014-04-09T09:00:44Z"
+    },
+    "profile": {
+        "accessKey": "...",
+        "region": "...",
+        "name": "...",
+        "tokenDuration": 123, // Optional
+        "roleArn": "..."      // Optional
     }
 }
 ```

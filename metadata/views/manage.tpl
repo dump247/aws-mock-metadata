@@ -27,6 +27,7 @@ table.session td:last-child {
 </head>
 <body>
     <h2>Session</h2>
+<p>Profile: <strong>{{profile_name}}</strong></p>
 %if session:
     <table class="session">
     <tbody>
@@ -75,6 +76,41 @@ function newSession() {
     request.send('token=' + encodeURIComponent(document.getElementById('token').value));
     location.reload();
 }
+
+function changeProfile(name) {
+    var request = new XMLHttpRequest();
+    request.open('POST', '/manage/session', false);
+    request.send('profile=' + encodeURIComponent(name));
+    location.reload();
+}
 </script>
+
+<h1>Profiles</h1>
+
+<table>
+<thead>
+    <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Access Key</th>
+        <th>Token Duration</th>
+        <th>Role ARN</th>
+        <th>Region</th>
+    </tr>
+</thead>
+<tbody>
+%for name, profile in profiles.items():
+<tr>
+    <td><input onclick="changeProfile('{{name}}')" type="radio" name="profile" value="{{name}}"{{" checked" if name == profile_name else ""}}></td>
+    <td>{{name}}</td>
+    <td>{{profile.access_key}}</td>
+    <td>{{profile.token_duration}}</td>
+    <td>{{profile.role_arn}}</td>
+    <td>{{profile.region}}</td>
+</tr>
+%end
+</tbody>
+</table>
+
 </body>
 </html>
