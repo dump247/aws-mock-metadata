@@ -8,7 +8,50 @@ import os.path
 from metadata.util import cache, first_item, get_value
 
 
+class NoSuchProfileError(Exception):
+    def __init__(self, name):
+        super(NoSuchProfileError, self).__init__(
+            'Profile {} not found.'.format(name))
+
+
 class Metadata(object):
+    def __init__(self, profiles, profile_name):
+        self.profiles = profiles
+        self.profile_name = profile_name
+
+    @property
+    def profile_name(self):
+        return self.__profile_name
+
+    @profile_name.setter
+    def profile_name(self, name):
+        if name not in self.profiles:
+            raise NoSuchProfileError(name)
+
+        self.__profile_name = name
+
+    @property
+    def profile(self):
+        return self.profiles[self.profile_name]
+
+    # Replace uses of the following methods with metadata.profile.x
+
+    @property
+    def session(self):
+        return self.profile.session
+
+    @property
+    def session_expired(self):
+        return self.profile.session_expired
+
+    def clear_session(self, *args, **kw):
+        return self.profile.clear_session(*args, **kw)
+
+    def get_session(self, *args, **kw):
+        return self.profile.get_session(*args, **kw)
+
+
+class Profile(object):
     def __init__(self, region='us-east-1', access_key=None, secret_key=None,
                  token_duration=None, role_arn=None):
         self.region = region

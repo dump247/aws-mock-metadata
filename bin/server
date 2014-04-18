@@ -5,12 +5,13 @@ from __future__ import absolute_import, print_function
 import argparse
 from os import path
 import sys
+import re
 
 APP_DIR = path.abspath(path.join(path.dirname(__file__), '..'))
 DEFAULT_CONFIG_FILE = path.relpath(path.join(APP_DIR, 'server.conf'))
 sys.path.append(APP_DIR)
 
-from metadata import bottle, routes, Metadata
+from metadata import bottle, routes, Metadata, Profile
 
 
 bottle.TEMPLATE_PATH.append(path.join(APP_DIR, 'metadata/views'))
@@ -38,6 +39,45 @@ def to_int(value):
     return value if value is None else int(value)
 
 
+def parse_profiles(config):
+    prog = re.compile('^profile:([^\.]+)\.(.*)$')
+    profiles = {}
+    region = app.config.get('aws.region', 'us-east-1')
+    access_key = app.config.get('aws.access_key')
+    secret_key = app.config.get('aws.secret_key')
+    token_duration = to_int(app.config.get('metadata.token_duration'))
+    role_arn = app.config.get('metadata.role_arn')
+
+    for key, value in config.items():
+        res = prog.match(key)
+
+        if res:
+            profiles.setdefault(res.group(1), {})[res.group(2)] = value
+
+    for profile in profiles.values():
+        profile.setdefault('region', region)
+        profile.setdefault('access_key', access_key)
+        profile.setdefault('secret_key', secret_key)
+        profile.setdefault('token_duration', token_duration)
+        profile.setdefault('role_arn', role_arn)
+
+    if 'default' not in profiles:
+        profiles['default'] = {
+            'region': region,
+            'access_key': access_key,
+            'secret_key': secret_key,
+            'role_arn': role_arn
+        }
+
+    result = {}
+    for name, values in profiles.items():
+        try:
+            result[name] = Profile(**values)
+        except Exception, ex:
+            raise Exception("Error loading profile {}".format(name), ex)
+
+    return result
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -57,17 +97,22 @@ if __name__ == '__main__':
         type=port,
         help='port to bind the metadata server to (default: 45000)')
 
+    parser.add_argument(
+        '--profile',
+        help='name of the profile to load by default')
+
     args = parser.parse_args()
 
     app = bottle.default_app()
     app.config.load_config(args.config or DEFAULT_CONFIG_FILE)
 
-    app.config.meta_set('metadata', 'obj', Metadata(
-        region=app.config.get('aws.region', 'us-east-1'),
-        access_key=app.config.get('aws.access_key'),
-        secret_key=app.config.get('aws.secret_key'),
-        token_duration=to_int(app.config.get('metadata.token_duration')),
-        role_arn=app.config.get('metadata.role_arn')))
+    profile_name = args.profile or\
+        app.config.get('metadata.profile', 'default')
+
+    app.config.meta_set(
+        'metadata',
+        'obj',
+        Metadata(parse_profiles(app.config), profile_name))
 
     app.run(
         host=args.host or app.config.get('metadata.host', '169.254.169.254'),

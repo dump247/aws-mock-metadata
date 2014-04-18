@@ -11,7 +11,7 @@ echo "Redirecting ${APP_HOST} port 80 => ${APP_PORT}"
 sudo ipfw add ${FW_RULE_NUM} fwd ${APP_HOST},${APP_PORT} tcp from any to ${APP_HOST} 80 in
 
 echo "Running AWS mock metadata service"
-$(dirname $0)/server --host ${APP_HOST} --port ${APP_PORT}
+$(dirname $0)/server --host ${APP_HOST} --port ${APP_PORT} "${@}"
 
 echo
 echo "Removing redirect ${APP_HOST} port 80 => ${APP_PORT}"
