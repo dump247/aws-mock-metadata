@@ -4,7 +4,7 @@ APP_HOST=169.254.169.254
 APP_PORT=45000
 FW_RULE_NUM=59
 
-echo "Adding loopback allias ${APP_HOST}"
+echo "Adding loopback alias ${APP_HOST}"
 sudo ifconfig lo0 alias ${APP_HOST}
 
 echo "Redirecting ${APP_HOST} port 80 => ${APP_PORT}"
@@ -17,5 +17,5 @@ echo
 echo "Removing redirect ${APP_HOST} port 80 => ${APP_PORT}"
 sudo ipfw delete ${FW_RULE_NUM}
 
-echo "Removing loopback allias ${APP_HOST}"
+echo "Removing loopback alias ${APP_HOST}"
 sudo ifconfig lo0 -alias ${APP_HOST}
