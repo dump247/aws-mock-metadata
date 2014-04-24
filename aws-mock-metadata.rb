@@ -12,6 +12,7 @@ class AwsMockMetadata < Formula
     end
 
     def install
+        ENV.prepend_create_path 'PYTHONPATH', libexec+'lib/python2.7/site-packages'
         resource('boto').stage { system "python", "setup.py", "install", "--prefix=#{libexec}" }
     end
 end
