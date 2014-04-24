@@ -21,6 +21,17 @@ the user to enter the MFA device token. Those credentials are cached
 until they expire and the user is prompted again to provide an updated
 token.
 
+# Dependencies
+
+This application is still beta and may change in breaking ways in the
+future.
+
+* python 2
+  * python 3 has not been tested
+* boto python library
+  * this may change to [botocore](https://github.com/boto/botocore), which
+    will impact config file format
+
 # Installation
 
 Currently only works on OSX, but should be trivial to make it work on
