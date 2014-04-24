@@ -52,7 +52,8 @@ This should be changed to run as a launchd daemon at some point.
 
 # Configuration
 
-*server.conf*
+*SERVICE_HOME/server.conf*<br>
+*~/.aws-mock-metadata/config*
 
 ```
 [aws]
