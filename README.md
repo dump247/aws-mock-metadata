@@ -74,7 +74,8 @@ token_duration=43200 # Optional. Timeout, in seconds, for the generated
                      # Default is 12 hours for sts:GetSessionToken and
                      # 1 hour for sts:AssumeRole. Maximum is 36 hours
                      # for sts:GetSessionToken and 1 hour for
-                     # sts:AssumeRole.
+                     # sts:AssumeRole. If you specify a value higher
+                     # than the maximum, the maximum is used.
 role_arn=arn:aws:iam::123456789012:role/${aws:username}
                      # Optional. ARN of a role to assume. If specified,
                      # the metadata server uses sts:AssumeRole to create
