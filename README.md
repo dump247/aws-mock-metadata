@@ -16,8 +16,9 @@ check this service to use the instance profile credentials.
 This service runs on a developer machine and masquerades as the
 Amazon metadata service. This allows it to integrate with the SDKs
 and provide session credentials when needed. When the metadata
-service is queried for security credentials, this service will prompt
-the user to enter the MFA device token. Those credentials are cached
+service is queried for security credentials, this service can prompt
+the user to enter the MFA device token or generate the OTP code (if
+the virtual MFA device secret is provided). Those credentials are cached
 until they expire and the user is prompted again to provide an updated
 token.
 
@@ -65,6 +66,10 @@ secret_key=...   # Optional. Secret key to generate temp keys with.
                  # credential discovery.
 region=us-east-1 # Optional. Not generally necessary since IAM and STS
                  # are not region specific. Default is us-east-1.
+mfa_secret=...   # Optional. Base32 encoded virtual MFA device secret.
+                 # If set, the metadata server will generate OTP codes
+                 # internally instead of showing a prompt. The secret
+                 # is provided when setting up the virtual mfa device.
 
 [metadata]
 host=169.254.169.254 # Optional. Interface to bind to. Default is
@@ -104,9 +109,10 @@ role_arn=...
 
 ## AWS CLI
 
-It is recommended to update the local metadata service timeout for the
-AWS command line interface. This ensures that you have enough time to
-enter the MFA token before the request expires and your script can
+If you don't provide the MFA secret and use a separate device to generate
+OTP codes, it is recommended to update the local metadata service timeout
+for the AWS command line interface. This ensures that you have enough time
+to enter the MFA token before the request expires and your script can
 continue without interruption.
 
 *~/.aws/config*
@@ -125,8 +131,9 @@ The following EC2 metadata service endpoints are implemented.
 169.254.169.254/latest/meta-data/iam/security-credentials/local-credentials
 ```
 
-When `/latest/meta-data/iam/security-credentials/local-credentials` is
-requested, and there are no session credentials available, a dialog pops
+If the MFA device secret is not provided and 
+`/latest/meta-data/iam/security-credentials/local-credentials` is
+requested and there are no session credentials available, a dialog pops
 up prompting for the MFA token. The dialog blocks the request until the
 correct token is entered. Once the token is provided, the session
 credentials are generated and cached until they expire. Once they

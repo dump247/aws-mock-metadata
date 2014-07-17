@@ -45,6 +45,7 @@ def parse_profiles(config):
     region = app.config.get('aws.region', 'us-east-1')
     access_key = app.config.get('aws.access_key')
     secret_key = app.config.get('aws.secret_key')
+    mfa_secret = app.config.get('aws.mfa_secret')
     token_duration = to_int(app.config.get('metadata.token_duration'))
     role_arn = app.config.get('metadata.role_arn')
 
@@ -60,13 +61,15 @@ def parse_profiles(config):
         profile.setdefault('secret_key', secret_key)
         profile.setdefault('token_duration', token_duration)
         profile.setdefault('role_arn', role_arn)
+        profile.setdefault('mfa_secret', mfa_secret)
 
     if 'default' not in profiles:
         profiles['default'] = {
             'region': region,
             'access_key': access_key,
             'secret_key': secret_key,
-            'role_arn': role_arn
+            'role_arn': role_arn,
+            'mfa_secret': mfa_secret
         }
 
     result = {}

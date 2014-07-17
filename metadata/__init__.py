@@ -6,7 +6,7 @@ import boto.sts
 import subprocess
 import os.path
 from metadata.util import cache, first_item, get_value
-
+from metadata import otp
 
 class NoSuchProfileError(Exception):
     def __init__(self, name):
@@ -53,12 +53,13 @@ class Metadata(object):
 
 class Profile(object):
     def __init__(self, region='us-east-1', access_key=None, secret_key=None,
-                 token_duration=None, role_arn=None):
+                 token_duration=None, role_arn=None, mfa_secret=None):
         self.region = region
         self.access_key = access_key
         self.secret_key = secret_key
         self.token_duration = token_duration
         self.role_arn = role_arn
+        self.otp = otp.Totp(mfa_secret) if mfa_secret is not None else None
 
         self.user = None
         self.session = None
@@ -109,8 +110,11 @@ class Profile(object):
             else None
 
     def _prompt_token(self):
-        script = os.path.join(os.path.dirname(__file__), 'prompt.py')
-        return subprocess.check_output(['/usr/bin/python', script]).strip()
+        if self.otp:
+            return str(self.otp.generate())
+        else:
+            script = os.path.join(os.path.dirname(__file__), 'prompt.py')
+            return subprocess.check_output(['/usr/bin/python', script]).strip()
 
     def _create_session(self, token_value):
         if self.role_arn:
