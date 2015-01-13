@@ -1,2 +1,3 @@
 *.pyc
 server.conf
+bin/pf.conf

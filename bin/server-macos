@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 APP_HOST=169.254.169.254
 APP_PORT=45000
@@ -8,14 +8,35 @@ echo "Adding loopback alias ${APP_HOST}"
 sudo ifconfig lo0 alias ${APP_HOST}
 
 echo "Redirecting ${APP_HOST} port 80 => ${APP_PORT}"
-sudo ipfw add ${FW_RULE_NUM} fwd ${APP_HOST},${APP_PORT} tcp from any to ${APP_HOST} 80 in
+if which ipfw > /dev/null; then
+  sudo ipfw add ${FW_RULE_NUM} fwd ${APP_HOST},${APP_PORT} tcp from any to ${APP_HOST} 80 in
+else
+  SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+  cat <<EOF > ${SCRIPT_DIR}/pf.conf
+rdr-anchor "forwarding"
+load anchor "forwarding" from "${SCRIPT_DIR}/pf.anchor"
+
+EOF
+  pfctlOutput=`sudo pfctl -Ef "${SCRIPT_DIR}/pf.conf" 2>&1`
+  if [[ "$?" != "0" ]]; then
+    echo "Unable to setup port forwarding:\n$pfctlOutput";
+  fi
+  TOKEN=`echo ${pfctlOutput} | sed 's/.*Token : //'`
+fi
 
 echo "Running AWS mock metadata service"
 $(dirname $0)/server --host ${APP_HOST} --port ${APP_PORT} "${@}"
 
 echo
 echo "Removing redirect ${APP_HOST} port 80 => ${APP_PORT}"
-sudo ipfw delete ${FW_RULE_NUM}
+if which ipfw > /dev/null; then
+  sudo ipfw delete ${FW_RULE_NUM}
+else
+  pfctlOutput=`sudo pfctl -X ${TOKEN} 2>&1`
+  if [[ "$?" != "0" ]]; then
+    echo "Unable to disable port forwarding: \n $pfctlOutput"
+  fi
+fi
 
 echo "Removing loopback alias ${APP_HOST}"
 sudo ifconfig lo0 -alias ${APP_HOST}
