@@ -11,7 +11,7 @@ APP_DIR = path.abspath(path.join(path.dirname(__file__), '..'))
 DEFAULT_CONFIG_FILE = path.relpath(path.join(APP_DIR, 'server.conf'))
 sys.path.append(APP_DIR)
 
-from metadata import bottle, routes, Metadata, Profile
+from metadata import bottle, Metadata, Profile
 
 
 bottle.TEMPLATE_PATH.append(path.join(APP_DIR, 'metadata/views'))
@@ -39,14 +39,22 @@ def to_int(value):
     return value if value is None else int(value)
 
 
+def to_bool(value, default=False):
+    if value is None:
+        return default
+
+    return value.lower() in ('yes', 'true', 'y', 't', '1')
+
+
 def parse_profiles(config):
     prog = re.compile('^profile:([^\.]+)\.(.*)$')
     profiles = {}
     region = app.config.get('aws.region', 'us-east-1')
     access_key = app.config.get('aws.access_key')
     secret_key = app.config.get('aws.secret_key')
+    mfa_enabled = app.config.get('aws.mfa_enabled')
     mfa_secret = app.config.get('aws.mfa_secret')
-    token_duration = to_int(app.config.get('metadata.token_duration'))
+    token_duration = app.config.get('metadata.token_duration')
     role_arn = app.config.get('metadata.role_arn')
 
     for key, value in config.items():
@@ -55,22 +63,16 @@ def parse_profiles(config):
         if res:
             profiles.setdefault(res.group(1), {})[res.group(2)] = value
 
+    profiles.setdefault('default', {})
+
     for profile in profiles.values():
         profile.setdefault('region', region)
         profile.setdefault('access_key', access_key)
         profile.setdefault('secret_key', secret_key)
-        profile.setdefault('token_duration', token_duration)
+        profile['token_duration'] = to_int(profile.setdefault('token_duration', token_duration))
         profile.setdefault('role_arn', role_arn)
         profile.setdefault('mfa_secret', mfa_secret)
-
-    if 'default' not in profiles:
-        profiles['default'] = {
-            'region': region,
-            'access_key': access_key,
-            'secret_key': secret_key,
-            'role_arn': role_arn,
-            'mfa_secret': mfa_secret
-        }
+        profile['mfa_enabled'] = to_bool(profile.setdefault('mfa_enabled', mfa_enabled), default=True)
 
     result = {}
     for name, values in profiles.items():
