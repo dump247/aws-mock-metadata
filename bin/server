@@ -11,7 +11,7 @@ APP_DIR = path.abspath(path.join(path.dirname(__file__), '..'))
 DEFAULT_CONFIG_FILE = path.relpath(path.join(APP_DIR, 'server.conf'))
 sys.path.append(APP_DIR)
 
-from metadata import bottle, Metadata, Profile
+from metadata import bottle, routes, Metadata, Profile
 
 
 bottle.TEMPLATE_PATH.append(path.join(APP_DIR, 'metadata/views'))

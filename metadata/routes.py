@@ -55,6 +55,7 @@ def get_credentials():
         session = request.app.config.meta_get('metadata', 'obj').get_session()
 
         return {
+             'Code':           'Success',
             'AccessKeyId':     session.access_key,
             'SecretAccessKey': session.secret_key,
             'Token':           session.session_token,
