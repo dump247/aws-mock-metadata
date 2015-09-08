@@ -69,10 +69,12 @@ def parse_profiles(config):
         profile.setdefault('region', region)
         profile.setdefault('access_key', access_key)
         profile.setdefault('secret_key', secret_key)
-        profile['token_duration'] = to_int(profile.setdefault('token_duration', token_duration))
+        profile['token_duration'] = to_int(
+            profile.setdefault('token_duration', token_duration))
         profile.setdefault('role_arn', role_arn)
         profile.setdefault('mfa_secret', mfa_secret)
-        profile['mfa_enabled'] = to_bool(profile.setdefault('mfa_enabled', mfa_enabled), default=True)
+        profile['mfa_enabled'] = to_bool(profile.setdefault(
+            'mfa_enabled', mfa_enabled), default=True)
 
     result = {}
     for name, values in profiles.items():
