@@ -5,6 +5,48 @@ from boto.exception import BotoServerError
 from metadata.bottle import route, response, view, delete, post, request
 
 
+@route('/latest/meta-data/local-hostname')
+def localhost():
+    response.content_type = 'text/plain; charset=UTF-8'
+    return 'localhost'
+
+
+@route('/latest/meta-data/hostname')
+def host():
+    response.content_type = 'text/plain; charset=UTF-8'
+    return 'localhost'
+
+
+@route('/latest/meta-data/public-hostname')
+def public_host():
+    response.content_type = 'text/plain; charset=UTF-8'
+    return 'localhost'
+
+
+@route('/latest/meta-data/mac')
+def vpc_id():
+    response.content_type = 'text/plain; charset=UTF-8'
+    return 'mac1234'
+
+
+@route('/latest/meta-data/network/interfaces/macs/mac1234/vpc-id')
+def vpc_id():
+    response.content_type = 'text/plain; charset=UTF-8'
+    return 'vpc-1234'
+
+
+@route('/latest/meta-data/local-ipv4')
+def localip4():
+    response.content_type = 'text/plain; charset=UTF-8'
+    return '127.0.1.1'
+
+
+@route('/latest/meta-data/instance-type')
+def instance_type():
+    response.content_type = 'text/plain; charset=UTF-8'
+    return 'r3.2xlarge'
+
+
 @route('/latest/meta-data/iam/security-credentials/')
 def list_profiles():
     response.content_type = 'text/plain; charset=UTF-8'
@@ -17,6 +59,7 @@ def get_credentials():
         session = request.app.config.meta_get('metadata', 'obj').get_session()
 
         return {
+            'Code':           'Success',
             'AccessKeyId':     session.access_key,
             'SecretAccessKey': session.secret_key,
             'Token':           session.session_token,
