@@ -46,7 +46,7 @@ def instance_type():
     response.content_type = 'text/plain; charset=UTF-8'
     return 'r3.2xlarge'
 
-
+@route('/latest/meta-data/iam/security-credentials')
 @route('/latest/meta-data/iam/security-credentials/')
 def list_profiles():
     response.content_type = 'text/plain; charset=UTF-8'
