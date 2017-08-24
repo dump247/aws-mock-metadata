@@ -69,6 +69,24 @@ def get_credentials():
         response.status = e.status
         return {'error': {'message': e.message}}
 
+@route('/latest/dynamic/instance-identity/document')
+def get_identity_document():
+    return {
+        'privateIp' : '127.0.0.1',
+        'devpayProductCodes' : None,
+        'availabilityZone' : 'us-east-1a',
+        'version' : '2010-08-31',
+        'instanceId' : 'i-12345678',
+        'billingProducts' : None,
+        'instanceType' : 't2.nano',
+        'accountId' : '123456789012',
+        'architecture' : 'x86_64',
+        'kernelId' : None,
+        'ramdiskId' : None,
+        'imageId' : 'ami-12345678',
+        'pendingTime' : '2016-01-01T00:00:00Z',
+        'region' : 'us-east-1'
+    }
 
 @route('/manage')
 @view('manage')
