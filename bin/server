@@ -80,7 +80,7 @@ def parse_profiles(config):
     for name, values in profiles.items():
         try:
             result[name] = Profile(**values)
-        except Exception, ex:
+        except Exception as ex:
             raise Exception("Error loading profile {}".format(name), ex)
 
     return result
