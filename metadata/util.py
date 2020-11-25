@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-
+from functools import reduce
 
 def get_value(d, *keys):
     return reduce(lambda a, b: a[b], keys, d)

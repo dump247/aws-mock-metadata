@@ -1,7 +1,10 @@
 #!/usr/bin/python
 
 import os
-from Tkinter import Tk, Label, Button, Entry, ACTIVE
+try:
+    from tkinter import Tk, Label, Button, Entry, ACTIVE
+except:
+    from Tkinter import Tk, Label, Button, Entry, ACTIVE
 
 root = Tk()
 root.wm_title("Enter MFA Token")
@@ -12,7 +15,7 @@ entry.pack(padx=5)
 
 
 def done():
-    print entry.get()
+    print(entry.get())
     root.destroy()
 
 b = Button(root, text="OK", default=ACTIVE, command=done)
